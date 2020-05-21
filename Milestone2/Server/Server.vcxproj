@@ -34,8 +34,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="server.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{43fc27bc-edb3-489e-8b03-140cf0696670}</ProjectGuid>
+    <ProjectGuid>{8fbfc59c-05fd-48c5-8b52-4c01410da124}</ProjectGuid>
     <Keyword>Linux</Keyword>
     <RootNamespace>Server</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
@@ -59,7 +62,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
-    <RemoteRootDir>~/CPSC-5042-Project</RemoteRootDir>
+    <RemoteRootDir>~/CPSC5042-Project</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -78,11 +81,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Github Settle university\server.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalOptions>-lpthread %(AdditionalOptions)</AdditionalOptions>
