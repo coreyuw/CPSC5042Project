@@ -276,6 +276,28 @@ int rpcConnect(char* pszUserName, char* pszPass) {
 
     return 0;
 }
+
+bool isUserAuthorized(int new_socket, pair<char*, char*> rpc, char* newUser, RawKeyValueString* pRawKey) {
+
+    if (strcmp(rpc.second, "connect") == 0) {
+        KeyValue user, pass;
+        pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
+        pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
+
+        if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
+            newUser = userKeyValue.second;
+            cout << newUser << " is connected now...\n";
+            send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
+        }
+        else {
+            cout << "client username or password incorrect" << endl;
+            send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
+            return false;
+        }
+    }
+    return true;
+}
+
 void* rpcThread(void* arg) {
     int new_socket = *(int*)socket;
     int valread;
@@ -294,23 +316,11 @@ void* rpcThread(void* arg) {
             RawKeyValueString* pRawKey = new RawKeyValueString((char*)buffer);
             KeyValue rpcKeyValue;
             pair<char*, char*> rpc = extractKeyValue(pRawKey, rpcKeyValue);
-
+            
             if (strcmp(rpc.second, "connect") == 0) {
-                KeyValue user, pass;
-                pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
-                pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
-
-                if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
-                    newUser = userKeyValue.second;
-                    cout << newUser << " is connected now...\n";
-                    send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
-                } else {
-                    cout << "client username or password incorrect" << endl;
-                    send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-                }
+                isUserAuthorized(new_socket, rpc, newUser, pRawKey);
             }
-
-            else if (strcmp(rpc.second, "1") == 0) {
+             else if (strcmp(rpc.second, "1") == 0) {
                 send(new_socket, "implement view List", strlen("implement view List"), 0);
             }
 
