@@ -281,6 +281,7 @@ void* rpcThread(void* arg) {
     int valread;
     char buffer[1024] = {0};
     void* status = NULL;
+    char* newUser;
 
     // We will  block when there are too many connections. Lets say 100
     ServerContextData* pServerContextData = (ServerContextData*)arg;
@@ -300,7 +301,8 @@ void* rpcThread(void* arg) {
                 pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
 
                 if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
-                    cout << userKeyValue.second << " is connected now...\n";
+                    newUser = userKeyValue.second;
+                    cout << newUser << " is connected now...\n";
                     send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
                 } else {
                     cout << "client username or password incorrect" << endl;
@@ -325,7 +327,8 @@ void* rpcThread(void* arg) {
             }
 
             else {
-                printf("Client with socket %d is leaving.\n", new_socket);
+               
+                printf("%s with socket %d is leaving.\n", newUser, new_socket);
                 pthread_exit(status);
             }
 
