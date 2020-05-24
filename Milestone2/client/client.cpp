@@ -207,7 +207,7 @@ int disconnectServer(int& sock) {
 int menu(int& sock) {
     string option;
 
-    cout << "\nMenu:\n1.View item List\n 2.View your cart\n 3.Add item to cart\n 4.remove from list\n 5.discconect " << endl;
+    cout << "\nMenu:\n 1.View item List\n 2.View your cart\n 3.Add item to cart\n 4.remove from list\n 5.discconect " << endl;
     cout << "Enter your option: ";
     getline(cin, option);
     if (option == "1") {
