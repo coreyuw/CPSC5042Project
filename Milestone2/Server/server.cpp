@@ -16,6 +16,7 @@
 
 #include "assert.h"
 using namespace std;
+int userCounter;
 pthread_mutex_t counter_mutex = PTHREAD_MUTEX_INITIALIZER;
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////Mike code//////////////////////////////////////////////////////////////////////////
@@ -288,9 +289,14 @@ char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* 
             
             cout << userKeyValue.second << " is connected now...\n";
             send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
+            pthread_mutex_lock(&counter_mutex);
+            userCounter++;
+            printf("Number of active users : %d \n", userCounter);
+            pthread_mutex_unlock(&counter_mutex);
+
         }
         else {
-            cout << "User Connection Faild! Incorrect Username or Password! " << endl;
+            cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
             send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
             return NULL;
         }
@@ -339,6 +345,10 @@ void* rpcThread(void* arg) {
             else {
                
                 printf("%s with socket #%d is disconnected now!\n", newUser, new_socket);
+                pthread_mutex_lock(&counter_mutex);
+                userCounter--;
+                printf("Number of active users : %d \n", userCounter);
+                pthread_mutex_unlock(&counter_mutex);
                 pthread_exit(status);
             }
 
@@ -388,5 +398,6 @@ int main(int argc, char const* argv[]) {
         serverContextDataObj->setSocket(newSocket);
         pthread_create(&p1, NULL, rpcThread, (void*)serverContextDataObj);
       //  printf("Server accepted one thread. On to another!\n");
+
     } while (status == 0);
 }
