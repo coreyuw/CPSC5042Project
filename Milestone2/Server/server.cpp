@@ -277,7 +277,7 @@ int rpcConnect(char* pszUserName, char* pszPass) {
     return 0;
 }
 
-bool isUserAuthorized(int new_socket, pair<char*, char*> rpc, char* newUser, RawKeyValueString* pRawKey) {
+void isUserAuthorized(int new_socket, pair<char*, char*> rpc, char*& newUser, RawKeyValueString* pRawKey) {
 
     if (strcmp(rpc.second, "connect") == 0) {
         KeyValue user, pass;
@@ -292,10 +292,9 @@ bool isUserAuthorized(int new_socket, pair<char*, char*> rpc, char* newUser, Raw
         else {
             cout << "client username or password incorrect" << endl;
             send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-            return false;
+            return;
         }
     }
-    return true;
 }
 
 void* rpcThread(void* arg) {
