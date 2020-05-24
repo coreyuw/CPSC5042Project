@@ -290,7 +290,7 @@ char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* 
             send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
         }
         else {
-            cout << "client username or password incorrect" << endl;
+            cout << "User Connection Faild! Incorrect Username or Password! " << endl;
             send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
             return NULL;
         }

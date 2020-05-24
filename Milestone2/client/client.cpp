@@ -130,7 +130,7 @@ int connectRPC(int& sock) {
             cout << "\nServer is busy. Please wait ..." << endl;
             valread = read(sock, buffer, 1024);
             if (strcmp(buffer, "Not Authorized") == 0) {
-                cout << buffer;
+                cout << buffer<<"!";
                 cout << "\n";
             } else {
                 cout << buffer;
