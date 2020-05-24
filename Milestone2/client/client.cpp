@@ -99,38 +99,43 @@ class RawKeyValueString {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+string  getMessage() {
+
+    string username;
+    string password;
+    cout << "\nEnter your username: ";
+    getline(cin, username);
+    cout << "Enter your password: ";
+    getline(cin, password);
+
+    string rpcMessage = "rpc=connect;user=" + username + ";password=" + password + ";";
+    const char* messageTOserver = rpcMessage.c_str();
+
+    return  messageTOserver;
+}
+
+
 //Connnect Rpc
 int connectRPC(int& sock) {
     string option;
     cout << "Do You want to connect to the server?\n";
-
     while (true) {
         memset(buffer, 0, 1024);
         cout << "\nMenu:\n1.Connect\n2.Disconnect" << endl;
         cout << "Enter number for option: ";
         getline(cin, option);
         if (option.compare("1") == 0) {
-            string username;
-            string password;
-            cout << "\nEnter your username: ";
-            getline(cin, username);
-            cout << "Enter your password: ";
-            getline(cin, password);
-
-            string rpcMessage = "rpc=connect;user=" + username + ";password=" + password + ";";
-
-            const char* messageTOserver = rpcMessage.c_str();
+            const char* messageTOserver = getMessage().c_str();
             send(sock, messageTOserver, strlen(messageTOserver), 0);
             cout << "\nServer is busy. Please wait ..." << endl;
             valread = read(sock, buffer, 1024);
-
             if (strcmp(buffer, "Not Authorized") == 0) {
                 cout << buffer;
                 cout << "\n";
             } else {
                 cout << buffer;
                 cout << "\n";
-                return 1;
+                return 1;     
             }
         } else if (option.compare("2") == 0) {
             break;
