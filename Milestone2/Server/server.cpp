@@ -277,7 +277,7 @@ int rpcConnect(char* pszUserName, char* pszPass) {
     return 0;
 }
 
-bool isUserAuthorized(int new_socket, pair<char*, char*> rpc, char* newUser, RawKeyValueString* pRawKey) {
+char* authorizedUser(int new_socket, pair<char*, char*> rpc, char* newUser, RawKeyValueString* pRawKey) {
 
     if (strcmp(rpc.second, "connect") == 0) {
         KeyValue user, pass;
@@ -292,10 +292,10 @@ bool isUserAuthorized(int new_socket, pair<char*, char*> rpc, char* newUser, Raw
         else {
             cout << "client username or password incorrect" << endl;
             send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-            return false;
+            return NULL;
         }
     }
-    return true;
+    return newUser;
 }
 
 void* rpcThread(void* arg) {
@@ -318,7 +318,7 @@ void* rpcThread(void* arg) {
             pair<char*, char*> rpc = extractKeyValue(pRawKey, rpcKeyValue);
             
             if (strcmp(rpc.second, "connect") == 0) {
-                isUserAuthorized(new_socket, rpc, newUser, pRawKey);
+                newUser = authorizedUser(new_socket, rpc, newUser, pRawKey);
             }
              else if (strcmp(rpc.second, "1") == 0) {
                 send(new_socket, "implement view List", strlen("implement view List"), 0);
@@ -338,7 +338,7 @@ void* rpcThread(void* arg) {
 
             else {
                
-                printf("%s with socket %d is leaving.\n", newUser, new_socket);
+                printf("%s with socket #%d is disconnected now!\n", newUser, new_socket);
                 pthread_exit(status);
             }
 
@@ -387,6 +387,6 @@ int main(int argc, char const* argv[]) {
         //	serverObj->chatter(newSocket);
         serverContextDataObj->setSocket(newSocket);
         pthread_create(&p1, NULL, rpcThread, (void*)serverContextDataObj);
-        printf("Server accepted one thread. On to another!\n");
+      //  printf("Server accepted one thread. On to another!\n");
     } while (status == 0);
 }
