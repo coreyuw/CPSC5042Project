@@ -327,19 +327,19 @@ void* rpcThread(void* arg) {
                 newUser = authorizedUser(new_socket, rpc, pRawKey);
             }
              else if (strcmp(rpc.second, "1") == 0) {
-                send(new_socket, "implement view List", strlen("implement view List"), 0);
+                send(new_socket, "implement view List!", strlen("implement view List!"), 0);
             }
 
             else if (strcmp(rpc.second, "2") == 0) {
-                send(new_socket, "implement view cart", strlen("implement view cart"), 0);
+                send(new_socket, "implement view cart!", strlen("implement view cart!"), 0);
             }
 
             else if (strcmp(rpc.second, "3") == 0) {
-                send(new_socket, "implement add cart", strlen("implement add cart"), 0);
+                send(new_socket, "implement add cart!", strlen("implement add cart!"), 0);
             }
 
             else if (strcmp(rpc.second, "4") == 0) {
-                send(new_socket, "implement remove from cart", strlen("implement remove from cart"), 0);
+                send(new_socket, "implement remove from cart!", strlen("implement remove from cart!"), 0);
             }
 
             else {
