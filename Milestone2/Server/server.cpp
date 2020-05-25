@@ -17,6 +17,13 @@
 #include "assert.h"
 using namespace std;
 int userCounter;
+map<string, string> hashMap = {
+    {"sam","123"},
+    {"corey","123"},
+    {"hung","123"},
+    {"mike","123"}
+};
+
 pthread_mutex_t counter_mutex = PTHREAD_MUTEX_INITIALIZER;
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////Mike code//////////////////////////////////////////////////////////////////////////
@@ -265,11 +272,7 @@ class Server {
 };
 
 int rpcConnect(char* pszUserName, char* pszPass) {
-    map<string, string> hashMap;
-    hashMap["sam"] = "123";
-    hashMap["corey"] = "123";
-    hashMap["hung"] = "123";
-    hashMap["mike"] = "123";
+    
     const char* pass = hashMap[pszUserName].c_str();
     if (strcmp(pass, pszPass) == 0) {
         return 1;
@@ -325,6 +328,19 @@ void* rpcThread(void* arg) {
             
             if (strcmp(rpc.second, "connect") == 0) {
                 newUser = authorizedUser(new_socket, rpc, pRawKey);
+            }
+            else if (strcmp(rpc.second, "signUp") == 0) {
+                KeyValue user, pass;
+                pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
+                pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
+              
+                if (hashMap.count(userKeyValue.second) > 0) {
+                    send(new_socket, "Sorry! User Already Exists!!", strlen("Sorry! User Already Exists!!"), 0);
+                }
+                else {
+                    hashMap[userKeyValue.second] = passKeyValue.second;
+                    send(new_socket, "You successfully Signed up!", strlen("You successfully Signed up!"), 0);
+                }
             }
              else if (strcmp(rpc.second, "1") == 0) {
                 send(new_socket, "implement view List!", strlen("implement view List!"), 0);

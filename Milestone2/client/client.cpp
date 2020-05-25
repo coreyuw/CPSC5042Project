@@ -114,6 +114,21 @@ string  getMessage() {
     return  messageTOserver;
 }
 
+string  signUpUser() {
+
+    string username;
+    string password;
+    cout << "\nEnter your username: ";
+    getline(cin, username);
+    cout << "Enter your password: ";
+    getline(cin, password);
+
+    string rpcMessage = "rpc=signUp;user=" + username + ";password=" + password + ";";
+    const char* messageTOserver = rpcMessage.c_str();
+
+    return  messageTOserver;
+}
+
 
 //Connnect Rpc
 int connectRPC(int& sock) {
@@ -121,7 +136,7 @@ int connectRPC(int& sock) {
     cout << "Do You want to connect to the server?\n";
     while (true) {
         memset(buffer, 0, 1024);
-        cout << "\nMenu:\n1.Connect\n2.Disconnect" << endl;
+        cout << "\nMenu:\n1.Sign in\n2.Sign up\n3.Exit" << endl;
         cout << "Enter number for option: ";
         getline(cin, option);
         if (option.compare("1") == 0) {
@@ -138,8 +153,15 @@ int connectRPC(int& sock) {
                 return 1;     
             }
         } else if (option.compare("2") == 0) {
+            const char* messageTOserver = signUpUser().c_str();
+            send(sock, messageTOserver, strlen(messageTOserver), 0);
+            valread = read(sock, buffer, 1024);
+            cout << buffer << endl;
+        }
+        else if (option.compare("3") == 0) {
             break;
-        } else {
+        }
+        else {
             cout << "Invalid option!\n";
         }
     }
