@@ -487,7 +487,20 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
     return sucess;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+const char* rpcListItem()
+{
+    string message="";
+    for (auto &i:storage)
+    {
 
+        message += "id=" + to_string(i->getID()) + ";" + i->getName() + "=" + to_string(i->getQuantity()) + ";";
+    }
+    cout << message << endl;
+    return message.c_str();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 void* rpcThread(void* arg) {
     int new_socket = *(int*)socket;
     int valread;
@@ -521,7 +534,9 @@ void* rpcThread(void* arg) {
                     send(new_socket, "You successfully Signed up!", strlen("You successfully Signed up!"), 0);
                 }
             } else if (strcmp(rpc.second, "1") == 0) {
-                send(new_socket, "implement view List!", strlen("implement view List!"), 0);
+                const char* message = rpcListItem();
+    
+                send(new_socket, message, strlen(message), 0);
             }
 
             else if (strcmp(rpc.second, "2") == 0) {
