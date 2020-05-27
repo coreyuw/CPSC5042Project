@@ -168,15 +168,8 @@ int connectRPC(int& sock) {
     return 0;
 }
 
-/*
-DisconnectRPC
-*/
-int disconnectRPC(int& sock) {
-    send(sock, "rpc=5;", strlen("rpc=5;"), 0);
-    valread = read(sock, buffer, 1024);
-    cout << buffer << endl;
-    return 0;
-}
+
+
 
 int incrementRPC(int& sock, char* buff) {
     size_t valRead = 0;
@@ -224,19 +217,26 @@ int connectToServer(char* szHostName, char* szPort, int& sock) {
     return 1;
 }
 
+/*
+DisconnectRPC
+*/
 int disconnectServer(int& sock) {
     send(sock, "rpc=5;", strlen("rpc=5;"), 0);
+    valread = read(sock, buffer, 1024);
+    cout << buffer << endl;
     close(sock);
     return 0;
 }
 
 //Menu item for user
 int menu(int& sock) {
+    memset(buffer, 0, sizeof(buffer));
     string option;
 
     cout << "\nMenu:\n 1.View item List\n 2.View your cart\n 3.Add item to cart\n 4.remove from list\n 5.discconect " << endl;
     cout << "Enter your option: ";
     getline(cin, option);
+
     if (option == "1") {
         send(sock, "rpc=1;", strlen("rpc=1;"), 0);
         valread = read(sock, buffer, 1024);
@@ -247,11 +247,12 @@ int menu(int& sock) {
         valread = read(sock, buffer, 1024);
         cout << buffer << endl;
     } else if (option == "3") {
-        send(sock, "rpc=3;", strlen("rpc=3;"), 0);
+        send(sock, "rpc=3;1=1;", strlen("rpc=3;1=1;"), 0);
+        //send(sock, "", strlen("toiletpaper=1;"), 0);
         valread = read(sock, buffer, 1024);
         cout << buffer << endl;
     } else if (option == "4") {
-        send(sock, "rpc=4;", strlen("rpc=4;"), 0);
+        send(sock, "rpc=4;1=1;", strlen("rpc=4;1=1;"), 0);
         valread = read(sock, buffer, 1024);
         cout << buffer << endl;
 
@@ -268,12 +269,12 @@ int menu(int& sock) {
 int main(int argc, char const* argv[]) {
     int sock = 0;
     int status = 0;
-    char buff[128];
 
     status = connectToServer((char*)argv[1], (char*)argv[2], sock);
     int temp = connectRPC(sock);
     while (status && temp) {
         status = menu(sock);
     }
+    close(sock);
     return 0;
 }
