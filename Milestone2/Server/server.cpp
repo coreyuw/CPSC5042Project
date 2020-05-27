@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstdlib>
 
 // Server side C/C++ program to demonstrate Socket programming
 #include <assert.h>
@@ -18,13 +19,13 @@
 using namespace std;
 int userCounter;
 map<string, string> hashMap = {
-    {"sam","123"},
-    {"corey","123"},
-    {"hung","123"},
-    {"mike","123"}
-};
+    {"sam", "123"},
+    {"corey", "123"},
+    {"hung", "123"},
+    {"mike", "123"}};
 
 pthread_mutex_t counter_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////Mike code//////////////////////////////////////////////////////////////////////////
 class KeyValue {
@@ -103,26 +104,157 @@ pair<char*, char*> extractKeyValue(RawKeyValueString* pRawKey, KeyValue& rpcKeyV
     pRawKey->getNextKeyValue(rpcKeyValue);
     return {rpcKeyValue.getKey(), rpcKeyValue.getValue()};
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+class Product
+{
+    // Data Members
+private:
+    int id;
+    string name;
+    int quantity;
+
+    // Access specifier 
+public:
+
+    Product(int newID, string newName, int newQuantity)
+    {
+        id = newID;
+        name = newName;
+        quantity = newQuantity;
+    }
+
+    ~Product(){
+        cout << "Product destructor called for " << name << "with id: " << id << endl;
+    }
+
+        // Member Functions() 
+
+        int getID()
+    {
+        return id;
+    }
+
+    void setID(int newID)
+    {
+        id = newID;
+    }
+
+    string getName()
+    {
+        return name;
+    }
+
+    void setName(string newName)
+    {
+        name = newName;
+    }
+
+    int getQuantity()
+    {
+        return quantity;
+    }
+
+    void setQuantity(int newQuantity)
+    {
+        quantity = newQuantity;
+    }
+
+};
+class User {
+    // Data Members
+   private:
+    int id;
+    string username;
+    string password;
+    map<string, int> cart;
+
+    // Access specifier
+   public:
+    User(int newID, string name, string pass) {
+        id = newID;
+        username = name;
+        password = pass;
+    }
+
+    ~User() {
+        cout << "User destructor called for " << username << "with id: " << id << endl;
+    }
+
+    // Member Functions()
+    string getUsername() {
+        return username;
+    }
+
+    string getPassword() {
+        return password;
+    }
+
+    int addItem(string item, int quantity) {
+
+        if (cart.count(item)) {
+            cart[item] +=  quantity;
+
+        } else {
+            cart[item] = quantity;
+        }
+        return 1;
+    }
+    int deleteItem(string item, int quantity) {
+        
+        if (cart.count(item)) {
+            //if item<quallity
+            if (cart[item] < quantity) {
+                return 0;
+            }
+            cart[item] -= quantity;
+            if (cart[item] == 0) {
+                cart.erase(item);
+            }
+            return 1;
+        }
+        return 0;
+    }
+
+    //char* insideCart() {
+      //  char* message;
+        //for (const auto& kv : cart) {
+          //  strcat(message, kv.first);
+            //strcat(message, "=");
+            //strcat(message, kv.second);
+            //strcat(message, ";");
+        //}
+    // return message;
+    //}
+};
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 // This class will perform the various network Operations to set up the server
 
 class ServerContextData {
     // You will put in your own "Global Data" that you will share among all the various client connections you have. Change your "getters" to reflect that
     int connectionAmount;
-    int rpcAmount;
+
     int nSocket;
     pthread_mutex_t lock;
     pthread_cond_t fill;
     int nMaxAmount;
+   
 
    public:
     ServerContextData() {
         connectionAmount = 0;
-        rpcAmount = 0;
+
         pthread_mutex_init(&lock, NULL);
         pthread_cond_init(&fill, NULL);
         nSocket = 0;
-        nMaxAmount = 0;
     }
+
+
     int getConnectionAmount() {
         int nConAmount;
         pthread_mutex_lock(&lock);
@@ -137,20 +269,6 @@ class ServerContextData {
         pthread_mutex_unlock(&lock);
     }
 
-    void incrementTotalRpc() {
-        pthread_mutex_lock(&lock);
-        rpcAmount++;
-        pthread_mutex_unlock(&lock);
-    }
-
-    int getTotalRpc() {
-        int nRpcAmount;
-        pthread_mutex_lock(&lock);
-        nRpcAmount = rpcAmount;
-        pthread_mutex_unlock(&lock);
-        return nRpcAmount;
-    }
-
     int getSocket() {
         return nSocket;
     }
@@ -158,35 +276,6 @@ class ServerContextData {
     void setSocket(int nSocket) {
         this->nSocket = nSocket;
     }
-};
-
-class ConnectionContextData {
-    // You will put in your own "Global Data" that you will share among all the various client connections you have. Change your "getters" to reflect that
-
-   public:
-    ConnectionContextData() {
-        rpcAmount = 0;
-    }
-
-    void addRpcAmount() {
-        rpcAmount++;
-    }
-
-    void addSumAmount(int incAmt) {
-        sumAmount += incAmt;
-    }
-
-    int getRpcAmount() {
-        return rpcAmount;
-    }
-
-    int getSumAmount() {
-        return sumAmount;
-    }
-
-   private:
-    int rpcAmount = 0;
-    int sumAmount = 0;
 };
 
 class Server {
@@ -271,8 +360,9 @@ class Server {
     }
 };
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int rpcConnect(char* pszUserName, char* pszPass) {
-    
     const char* pass = hashMap[pszUserName].c_str();
     if (strcmp(pass, pszPass) == 0) {
         return 1;
@@ -282,31 +372,122 @@ int rpcConnect(char* pszUserName, char* pszPass) {
 }
 
 char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
+    KeyValue user, pass;
+    pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
+    pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
 
-    if (strcmp(rpc.second, "connect") == 0) {
-        KeyValue user, pass;
-        pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
-        pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
+    if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
+        cout << userKeyValue.second << " is connected now...\n";
+        send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
+        pthread_mutex_lock(&counter_mutex);
+        userCounter++;
+        printf("Number of active users : %d \n", userCounter);
+        pthread_mutex_unlock(&counter_mutex);
 
-        if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
-            
-            cout << userKeyValue.second << " is connected now...\n";
-            send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
-            pthread_mutex_lock(&counter_mutex);
-            userCounter++;
-            printf("Number of active users : %d \n", userCounter);
-            pthread_mutex_unlock(&counter_mutex);
-
-        }
-        else {
-            cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
-            send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-            return NULL;
-        }
-
-        return  userKeyValue.second;
+    } else {
+        cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
+        send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
+        return NULL;
     }
+
+    return userKeyValue.second;
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+vector<Product*> storage;
+map<string, User*> userMap;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+Product* getProduct(int id)
+{
+    for (auto& elem : storage)
+    {
+        if (elem->getID() == id)
+        {
+            return elem;
+        }
+    }
+    return NULL;
+}
+
+//need to check if product is avaiable 
+int isProductAvaible(Product* p, int quantity)
+{
+    cout << p->getQuantity() << "  " << quantity<<endl;
+    if (p->getQuantity() == 0 || p->getQuantity() - quantity < 0)
+    {
+        cout << "return 0" << endl;
+        return 0;
+    }
+
+    //update quantity
+    pthread_mutex_lock(&counter_mutex);
+    p->setQuantity(p->getQuantity() - quantity);
+    pthread_mutex_unlock(&counter_mutex);
+
+    return 1;
+}
+int rpcAddItem(int new_socket, RawKeyValueString* pRawKey, string newUser) {
+    KeyValue item;
+    pair<char*, char*> itemKeyValue = extractKeyValue(pRawKey, item);
+
+    //get user
+    User* user = userMap[newUser];
+
+    //get product 
+    Product* product = getProduct(atoi(itemKeyValue.first));
+    if (product == NULL)
+    {
+        send(new_socket, "Product ID not exist!", strlen("Product ID not exist!"), 0);
+        return 0;
+    }
+
+    //check if the product is avaiable
+    if ( isProductAvaible(product, atoi(itemKeyValue.second)) == 0)
+    {
+        send(new_socket, "Product quantity invalid!", strlen("Product quantity invalid!"), 0);
+        return 0;
+
+    }
+    cout << product->getQuantity() << endl;
+    int sucess = user->addItem(product->getName(), atoi(itemKeyValue.second));
+
+    send(new_socket, "Add item to cart!", strlen("Add item to cart!"), 0);
+    return sucess;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
+{
+    KeyValue item;
+    pair<char*, char*> itemKeyValue = extractKeyValue(pRawKey, item);
+
+    int quantity = atoi(itemKeyValue.second);
+    //get user
+    User* user = userMap[newUser];
+
+    //get product 
+    Product* product = getProduct(atoi(itemKeyValue.first));
+    if (product == NULL)
+    {
+        send(new_socket, "Product ID not exist!", strlen("Product ID not exist!"), 0);
+        return 0;
+    }
+    
+    //give item back to the storage 
+    pthread_mutex_lock(&counter_mutex);
+    product->setQuantity(product->getQuantity() + quantity);
+    pthread_mutex_unlock(&counter_mutex);
+
+    cout << product->getQuantity() << endl;
+    int sucess = user->deleteItem(product->getName(), quantity);
+    send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
+    return sucess;
+}
+
+
 void* rpcThread(void* arg) {
     int new_socket = *(int*)socket;
     int valread;
@@ -317,32 +498,29 @@ void* rpcThread(void* arg) {
     // We will  block when there are too many connections. Lets say 100
     ServerContextData* pServerContextData = (ServerContextData*)arg;
     new_socket = pServerContextData->getSocket();
-    ConnectionContextData* connectionContextDataObj = new ConnectionContextData();
 
     for (;;) {
-        valread = (int)read(new_socket, (void*)buffer, (size_t)1024);
+        valread = (int)read(new_socket, buffer, 1024);
         if (valread != 0) {
             RawKeyValueString* pRawKey = new RawKeyValueString((char*)buffer);
+            cout << (char*)buffer << endl;
             KeyValue rpcKeyValue;
             pair<char*, char*> rpc = extractKeyValue(pRawKey, rpcKeyValue);
-            
+
             if (strcmp(rpc.second, "connect") == 0) {
                 newUser = authorizedUser(new_socket, rpc, pRawKey);
-            }
-            else if (strcmp(rpc.second, "signUp") == 0) {
+            } else if (strcmp(rpc.second, "signUp") == 0) {
                 KeyValue user, pass;
                 pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
                 pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
-              
+
                 if (hashMap.count(userKeyValue.second) > 0) {
                     send(new_socket, "Sorry! User Already Exists!!", strlen("Sorry! User Already Exists!!"), 0);
-                }
-                else {
+                } else {
                     hashMap[userKeyValue.second] = passKeyValue.second;
                     send(new_socket, "You successfully Signed up!", strlen("You successfully Signed up!"), 0);
                 }
-            }
-             else if (strcmp(rpc.second, "1") == 0) {
+            } else if (strcmp(rpc.second, "1") == 0) {
                 send(new_socket, "implement view List!", strlen("implement view List!"), 0);
             }
 
@@ -351,15 +529,20 @@ void* rpcThread(void* arg) {
             }
 
             else if (strcmp(rpc.second, "3") == 0) {
-                send(new_socket, "implement add cart!", strlen("implement add cart!"), 0);
-            }
-
-            else if (strcmp(rpc.second, "4") == 0) {
-                send(new_socket, "implement remove from cart!", strlen("implement remove from cart!"), 0);
+                string str(newUser);
+                
+                if (!rpcAddItem(new_socket, pRawKey, str)) {
+                    cout << "problem in additem" << endl;
+                }
+            } else if (strcmp(rpc.second, "4") == 0) {
+                string str(newUser);
+                if (!rpcDeleteItem(new_socket, pRawKey, str))
+                {
+                    cout << "problem in Deleteitem" << endl;
+                }
             }
 
             else {
-               
                 printf("%s with socket #%d is disconnected now!\n", newUser, new_socket);
                 pthread_mutex_lock(&counter_mutex);
                 userCounter--;
@@ -367,30 +550,37 @@ void* rpcThread(void* arg) {
                 pthread_mutex_unlock(&counter_mutex);
                 pthread_exit(status);
             }
-
+            memset(buffer, 0, sizeof(buffer));
             delete pRawKey;
         }
-
-        // if (strcmp(buffer, "QUIT") == 0) {
-        //     connectionContextDataObj->addRpcAmount();
-        //     pServerContextData->incrementTotalRpc();
-        //     printf("Client with socket %d is leaving.\nTotal Server RPC Count: %d\n", nSocket, pServerContextData->getTotalRpc());
-        //     pthread_exit(status);
-        // }
-
-        // int incAmt = atoi((char const*)buffer);
-        // connectionContextDataObj->addSumAmount(incAmt);
-        // connectionContextDataObj->addRpcAmount();
-        // pServerContextData->incrementTotalRpc();
-        // printf("%s Bytes read = %d  from socket %d\n", buffer, valread, nSocket);
-        // printf("sumAmt=%d  ThreadRPCAmt=%d\n", connectionContextDataObj->getSumAmount(), connectionContextDataObj->getRpcAmount());
-        // send(nSocket, statusOK, strlen(statusOK), 0);
-
-        // printf("Response message sent.\n");
     }
     fflush(stdout);
 
     return NULL;
+}
+
+
+//Populate product 
+void populateProduct()
+{
+    Product* one = new Product(1, "toilet paper", 5);
+    Product* two = new Product(2, "table", 5);
+    Product* three = new Product(3, "mask", 5);
+    storage.push_back(one);
+    storage.push_back(two);
+    storage.push_back(three);
+}
+
+//Populate member
+void populateUser() {
+    User* Hung = new User(1, "hung", "123");
+    userMap["hung"] = Hung;
+
+    User* sam = new User(1, "sam", "123");
+    userMap["sam"] = sam;
+
+    User* corey = new User(1, "corey", "123");
+    userMap["corey"] = corey;
 }
 
 int main(int argc, char const* argv[]) {
@@ -400,6 +590,10 @@ int main(int argc, char const* argv[]) {
     Server* serverObj = new Server(nPort);
     ServerContextData* serverContextDataObj;
     serverContextDataObj = new ServerContextData();
+
+    populateUser();
+    populateProduct();
+
 
     //start the server
     serverObj->startServer();
@@ -413,7 +607,7 @@ int main(int argc, char const* argv[]) {
         //	serverObj->chatter(newSocket);
         serverContextDataObj->setSocket(newSocket);
         pthread_create(&p1, NULL, rpcThread, (void*)serverContextDataObj);
-      //  printf("Server accepted one thread. On to another!\n");
+        //  printf("Server accepted one thread. On to another!\n");
 
     } while (status == 0);
 }
