@@ -375,7 +375,7 @@ int rpcConnect(char* pszUserName, char* pszPass) {
     return 0;
 }
 
-char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
+string authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
     KeyValue user, pass;
     pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
     pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
@@ -393,8 +393,8 @@ char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* 
         send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
         return NULL;
     }
-
-    return userKeyValue.second;
+    string str(userKeyValue.second);
+    return str;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -536,7 +536,7 @@ void* rpcThread(void* arg) {
     int valread;
     char buffer[1024] = {0};
     void* status = NULL;
-    char* newUser;
+    string newUser;
 
     // We will  block when there are too many connections. Lets say 100
     ServerContextData* pServerContextData = (ServerContextData*)arg;
@@ -574,14 +574,14 @@ void* rpcThread(void* arg) {
             }
 
             else if (strcmp(rpc.second, "3") == 0) {
-                string str(newUser);
+               // string str(newUser);
                 
-                if (!rpcAddItem(new_socket, pRawKey, str)) {
+                if (!rpcAddItem(new_socket, pRawKey, newUser)) {
                     cout << "problem in additem" << endl;
                 }
             } else if (strcmp(rpc.second, "4") == 0) {
-                string str(newUser);
-                if (!rpcDeleteItem(new_socket, pRawKey, str))
+                //string str(newUser);
+                if (!rpcDeleteItem(new_socket, pRawKey, newUser))
                 {
                     cout << "problem in Deleteitem" << endl;
                 }
