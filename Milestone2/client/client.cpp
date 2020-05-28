@@ -107,9 +107,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-string  getMessage()
+string getMessage()
 {
-
 	string username;
 	string password;
 	cout << "\nEnter your username: ";
@@ -120,12 +119,11 @@ string  getMessage()
 	string rpcMessage = "rpc=connect;user=" + username + ";password=" + password + ";";
 	const char* messageTOserver = rpcMessage.c_str();
 
-	return  messageTOserver;
+	return messageTOserver;
 }
 
-string  signUpUser()
+string signUpUser()
 {
-
 	string username;
 	string password;
 	cout << "\nEnter your username: ";
@@ -136,9 +134,8 @@ string  signUpUser()
 	string rpcMessage = "rpc=signUp;user=" + username + ";password=" + password + ";";
 	const char* messageTOserver = rpcMessage.c_str();
 
-	return  messageTOserver;
+	return messageTOserver;
 }
-
 
 //Connnect Rpc
 int connectRPC(int& sock)
@@ -187,8 +184,6 @@ int connectRPC(int& sock)
 	}
 	return 0;
 }
-
-
 
 int connectToServer(char* szHostName, char* szPort, int& sock)
 {
@@ -257,6 +252,28 @@ string rpcAddItem()
 	sendMess += input + ";";
 	return sendMess;
 }
+string rpcDeleteItem()
+{
+	string input;
+	string sendMess = "rpc=4;";
+	cout << "Enter ID item you want to delete (0 to exit)" << endl;
+	getline(cin, input);
+	if (atoi(input.c_str()) == 0)
+	{
+		cout << "digit number only or user exist rpc" << endl;
+		return "";
+	}
+	sendMess += input + "=";
+	cout << "Enter the quantity you want to delete (0 to exit)" << endl;
+	getline(cin, input);
+	if (atoi(input.c_str()) == 0)
+	{
+		cout << "digit number only or user exist rpc" << endl;
+		return "";
+	}
+	sendMess += input + ";";
+	return sendMess;
+}
 //Menu item for user
 int menu(int& sock)
 {
@@ -288,16 +305,18 @@ int menu(int& sock)
 			send(sock, message.c_str(), strlen(message.c_str()), 0);
 			valread = (int)read(sock, buffer, 1024);
 			cout << buffer << endl;
-
 		}
 
 	}
 	else if (option == "4")
 	{
-		send(sock, "rpc=4;1=1;", strlen("rpc=4;1=1;"), 0);
-		valread = (int)(int)read(sock, buffer, 1024);
-		cout << buffer << endl;
-
+		string message = rpcDeleteItem();
+		if (!message.empty())
+		{
+			send(sock, message.c_str(), strlen(message.c_str()), 0);
+			valread = (int)read(sock, buffer, 1024);
+			cout << buffer << endl;
+		}
 	}
 	else if (option == "5")
 	{
@@ -309,7 +328,6 @@ int menu(int& sock)
 
 	return 1;
 }
-
 
 int main(int argc, char const* argv[])
 {
