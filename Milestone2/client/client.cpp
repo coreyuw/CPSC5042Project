@@ -170,24 +170,6 @@ int connectRPC(int& sock) {
 
 
 
-
-int incrementRPC(int& sock, char* buff) {
-    size_t valRead = 0;
-    char hello[24];
-    strcpy(hello, "Hello from client");
-
-    char buffer[1024] = {0};
-    send(sock, buff, strlen(buff), 0);
-    printf("Hello message sent\n");
-    if (strcmp(buff, "QUIT") == 0) {
-        return 0;
-    } else {
-        valRead = read(sock, buffer, 1024);
-        printf("ValRead=%lu buffer=%s\n", valRead, buffer);
-    }
-    return 0;
-}
-
 int connectToServer(char* szHostName, char* szPort, int& sock) {
     struct sockaddr_in serv_addr;
 
