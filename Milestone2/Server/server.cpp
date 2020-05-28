@@ -510,7 +510,7 @@ int rpcViewCart(int new_socket, RawKeyValueString* pRawKey, string newUser)
         string cartInfo="Cart info:\n";
         for (auto& cartItem : cart)
         {
-            cartInfo += "name: " + cartItem.first + "; Quantity: " + to_string(cartItem.second) + ".\n";
+            cartInfo += "name= " + cartItem.first + "; Quantity= " + to_string(cartItem.second) + ".\n";
         }
         send(new_socket, cartInfo.c_str(), strlen(cartInfo.c_str()), 0);
         return 1;
@@ -524,7 +524,7 @@ const char* rpcListItem()
     for (auto &i:storage)
     {
 
-        message += "id=" + to_string(i->getID()) + ";" + i->getName() + "=" + to_string(i->getQuantity()) + ";";
+        message += "id=" + to_string(i->getID()) + "; name=" + i->getName() + "; Quantity=" + to_string(i->getQuantity()) + ".\n";
     }
     cout << message << endl;
     return message.c_str();
