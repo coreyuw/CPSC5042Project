@@ -200,6 +200,7 @@ class User {
         }
         return 1;
     }
+
     int deleteItem(string item, int quantity) {
         
         if (cart.count(item) == 1) {
@@ -214,6 +215,10 @@ class User {
             return 1;
         }
         return 0;
+    }
+
+    map<string, int> getCart() {
+        return cart;
     }
 
     //char* insideCart() {
@@ -484,6 +489,32 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
     int sucess = user->deleteItem(product->getName(), quantity);
     send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
     return sucess;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int rpcViewCart(int new_socket, RawKeyValueString* pRawKey, string newUser)
+{
+    //get user
+    User* user = userMap[newUser];
+
+    //get cart 
+    map<string, int> cart = user->getCart();
+
+    if (cart.empty() == 1)
+    {
+        send(new_socket, "Cart is empty!", strlen("Cart is empty!"), 0);
+        return 0;
+    }
+    else {
+        string cartInfo="Cart info:\n";
+        for (auto& cartItem : cart)
+        {
+            cartInfo += "name: " + cartItem.first + "; Quantity: " + to_string(cartItem.second) + ".\n";
+        }
+        send(new_socket, cartInfo.c_str(), strlen(cartInfo.c_str()), 0);
+        return 1;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
