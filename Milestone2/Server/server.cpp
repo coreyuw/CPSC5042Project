@@ -193,9 +193,8 @@ class User {
 
     int addItem(string item, int quantity) {
 
-        if (cart.count(item)) {
+        if (cart.count(item) == 1) {
             cart[item] +=  quantity;
-
         } else {
             cart[item] = quantity;
         }
@@ -203,7 +202,7 @@ class User {
     }
     int deleteItem(string item, int quantity) {
         
-        if (cart.count(item)) {
+        if (cart.count(item) == 1) {
             //if item<quallity
             if (cart[item] < quantity) {
                 return 0;
