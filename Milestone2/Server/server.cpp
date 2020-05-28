@@ -570,7 +570,10 @@ void* rpcThread(void* arg) {
             }
 
             else if (strcmp(rpc.second, "2") == 0) {
-                send(new_socket, "implement view cart!", strlen("implement view cart!"), 0);
+                if (rpcViewCart(new_socket, pRawKey, newUser))
+                {
+                    cout << "Send cart item to user" << endl;
+                }
             }
 
             else if (strcmp(rpc.second, "3") == 0) {
