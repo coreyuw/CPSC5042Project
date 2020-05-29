@@ -16,6 +16,8 @@
 #include <string>
 
 #include "assert.h"
+
+
 using namespace std;
 int userCounter;
 map<string, string> hashMap = {
@@ -625,7 +627,7 @@ void* rpcThread(void* arg) {
         }
     }
     fflush(stdout);
-
+    delete pServerContextData;
     return NULL;
 }
 
@@ -681,4 +683,15 @@ int main(int argc, char const* argv[]) {
         //  printf("Server accepted one thread. On to another!\n");
 
     } while (status == 0);
+    delete serverObj;
+    delete serverContextDataObj;
+    for (auto& x : userMap)
+    {
+       delete x.second;
+    }
+    for (auto& x : storage)
+    {
+        delete x;
+    }
+    return 0;
 }
