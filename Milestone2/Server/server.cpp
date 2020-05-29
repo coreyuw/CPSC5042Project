@@ -430,7 +430,7 @@ int getProductIDFromName(string name)
 //need to check if product is avaiable 
 int isProductAvaible(Product* p, int quantity)
 {
-    cout << p->getQuantity() << "  " << quantity<<endl;
+ 
     if (p->getQuantity() == 0 || p->getQuantity() - quantity < 0)
     {
         cout << "return 0" << endl;
@@ -466,7 +466,7 @@ int rpcAddItem(int new_socket, RawKeyValueString* pRawKey, string newUser) {
         return 0;
 
     }
-    cout << product->getQuantity() << endl;
+
     int sucess = user->addItem(product->getName(), atoi(itemKeyValue.second));
 
     send(new_socket, "Add item to cart!", strlen("Add item to cart!"), 0);
@@ -522,7 +522,7 @@ int rpcViewCart(int new_socket, RawKeyValueString* pRawKey, string newUser)
         string cartInfo="Cart info:\n";
         for (auto& cartItem : cart)
         {
-            cartInfo +="id = "+to_string(getProductIDFromName(cartItem.first))+ " name = " + cartItem.first + " Quantity = " + to_string(cartItem.second) + ".\n";
+            cartInfo +="id = "+to_string(getProductIDFromName(cartItem.first))+ "| name = " + cartItem.first + "| Quantity = " + to_string(cartItem.second) + ".\n";
         }
         send(new_socket, cartInfo.c_str(), strlen(cartInfo.c_str()), 0);
         return 1;
@@ -536,9 +536,9 @@ const char* rpcListItem()
     for (auto &i:storage)
     {
 
-        message += "id=" + to_string(i->getID()) + "; name=" + i->getName() + "; Quantity=" + to_string(i->getQuantity()) + ".\n";
+        message += "id = " + to_string(i->getID()) + "| name=" + i->getName() + "| Quantity=" + to_string(i->getQuantity()) + ".\n";
     }
-    cout << message << endl;
+
     return message.c_str();
 }
 
@@ -579,6 +579,7 @@ void* rpcThread(void* arg) {
                 const char* message = rpcListItem();
     
                 send(new_socket, message, strlen(message), 0);
+                cout << newUser << " request liost Item" << endl;
             }
 
             else if (strcmp(rpc.second, "2") == 0) {
@@ -595,16 +596,24 @@ void* rpcThread(void* arg) {
                 if (!rpcAddItem(new_socket, pRawKey, str)) {
                     cout << "problem in additem" << endl;
                 }
+                else
+                {
+                    cout << "Add item fore user " <<str <<endl;
+                }
             } else if (strcmp(rpc.second, "4") == 0) {
-                //string str(newUser);
-                if (!rpcDeleteItem(new_socket, pRawKey, newUser))
+                string str(newUser);
+                if (!rpcDeleteItem(new_socket, pRawKey, str))
                 {
                     cout << "problem in Deleteitem" << endl;
+                }
+                else
+                {
+                    cout << "delete item for user " << str << endl;
                 }
             }
 
             else {
-                cout<< newUser<<" with socket" <<new_socket<<" is disconnected now!\n";
+                printf("%s with socket %d is leaving.\n", newUser, new_socket);
                 pthread_mutex_lock(&counter_mutex);
                 userCounter--;
                 printf("Number of active users : %d \n", userCounter);
