@@ -391,7 +391,7 @@ string authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString*
     } else {
         cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
         send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-        return NULL;
+        return "";
     }
     string str(userKeyValue.second);
     return str;
@@ -644,6 +644,7 @@ int main(int argc, char const* argv[]) {
 
 
     //start the server
+    cout << "Sever started" << endl;
     serverObj->startServer();
 
     do {
