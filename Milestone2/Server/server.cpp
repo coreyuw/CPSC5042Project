@@ -375,7 +375,7 @@ int rpcConnect(char* pszUserName, char* pszPass) {
     return 0;
 }
 
-string authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
+char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
     KeyValue user, pass;
     pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
     pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
@@ -391,10 +391,9 @@ string authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString*
     } else {
         cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
         send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-        return "";
+        return NULL;
     }
-    string str(userKeyValue.second);
-    return str;
+    return userKeyValue.second;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -413,6 +412,19 @@ Product* getProduct(int id)
         }
     }
     return NULL;
+}
+
+int getProductIDFromName(string name)
+{
+    int id = 0;
+    for (auto& elem : storage)
+    {
+        if (name.compare(elem->getName())==0 )
+        {
+            id= elem->getID();
+        }
+    }
+    return id;
 }
 
 //need to check if product is avaiable 
@@ -510,7 +522,7 @@ int rpcViewCart(int new_socket, RawKeyValueString* pRawKey, string newUser)
         string cartInfo="Cart info:\n";
         for (auto& cartItem : cart)
         {
-            cartInfo += "name= " + cartItem.first + "; Quantity= " + to_string(cartItem.second) + ".\n";
+            cartInfo +="id = "+to_string(getProductIDFromName(cartItem.first))+ " name = " + cartItem.first + " Quantity = " + to_string(cartItem.second) + ".\n";
         }
         send(new_socket, cartInfo.c_str(), strlen(cartInfo.c_str()), 0);
         return 1;
@@ -536,8 +548,8 @@ void* rpcThread(void* arg) {
     int valread;
     char buffer[1024] = {0};
     void* status = NULL;
-    string newUser;
-
+    char* newUser;
+    
     // We will  block when there are too many connections. Lets say 100
     ServerContextData* pServerContextData = (ServerContextData*)arg;
     new_socket = pServerContextData->getSocket();
@@ -570,16 +582,17 @@ void* rpcThread(void* arg) {
             }
 
             else if (strcmp(rpc.second, "2") == 0) {
-                if (rpcViewCart(new_socket, pRawKey, newUser))
+                string str(newUser);
+                if (rpcViewCart(new_socket, pRawKey, str))
                 {
                     cout << "Send cart item to user" << endl;
                 }
             }
 
             else if (strcmp(rpc.second, "3") == 0) {
-               // string str(newUser);
+                string str(newUser);
                 
-                if (!rpcAddItem(new_socket, pRawKey, newUser)) {
+                if (!rpcAddItem(new_socket, pRawKey, str)) {
                     cout << "problem in additem" << endl;
                 }
             } else if (strcmp(rpc.second, "4") == 0) {
@@ -591,7 +604,7 @@ void* rpcThread(void* arg) {
             }
 
             else {
-                printf("%s with socket #%d is disconnected now!\n", newUser, new_socket);
+                cout<< newUser<<" with socket" <<new_socket<<" is disconnected now!\n";
                 pthread_mutex_lock(&counter_mutex);
                 userCounter--;
                 printf("Number of active users : %d \n", userCounter);
