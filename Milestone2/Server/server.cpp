@@ -615,6 +615,8 @@ void* rpcThread(void* arg) {
             }
 
             else {
+
+                send(new_socket, "Disconnected from server...", strlen("Disconnected from server..."), 0);
                 printf("%s with socket %d is leaving.\n", newUser, new_socket);
                 pthread_mutex_lock(&counter_mutex);
                 userCounter--;
