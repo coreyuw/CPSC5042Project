@@ -141,7 +141,7 @@ int disconnectServer(int& sock)
 {
 	send(sock, "rpc=5;", strlen("rpc=5;"), 0);
 	valread = (int)read(sock, buffer, 1024);
-	cout << buffer << endl;
+	cout <<"\nThanks for using our services...\n" << buffer << endl;
 	close(sock);
 	return 0;
 }
@@ -196,7 +196,7 @@ int menu(int& sock)
 	memset(buffer, 0, sizeof(buffer));
 	string option;
 
-	cout << "\nMenu:\n 1.View item List\n 2.View your cart\n 3.Add item to cart\n 4.remove from list\n 5.discconect " << endl;
+	cout << "\nMenu:\n 1.View item List\n 2.View your cart\n 3.Add item to cart\n 4.Remove from list\n 5.Discconect " << endl;
 	cout << "Enter your option: ";
 	getline(cin, option);
 
