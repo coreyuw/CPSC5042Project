@@ -26,7 +26,7 @@ map<string, string> hashMap = {
     {"hung", "123"},
     {"mike", "123"}};
 
-pthread_mutex_t counter_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t counter_mutex; //PTHREAD_MUTEX_INITIALIZER;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////Mike code//////////////////////////////////////////////////////////////////////////
@@ -367,38 +367,6 @@ class Server {
 };
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int rpcConnect(char* pszUserName, char* pszPass) {
-    const char* pass = hashMap[pszUserName].c_str();
-    if (strcmp(pass, pszPass) == 0) {
-        return 1;
-    }
-
-    return 0;
-}
-
-char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
-    KeyValue user, pass;
-    pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
-    pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
-
-    if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
-        cout << userKeyValue.second << " is connected now...\n";
-        send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
-        pthread_mutex_lock(&counter_mutex);
-        userCounter++;
-        printf("Number of active users : %d \n", userCounter);
-        pthread_mutex_unlock(&counter_mutex);
-
-    } else {
-        cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
-        send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-        return NULL;
-    }
-    return userKeyValue.second;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 vector<Product*> storage;
 map<string, User*> userMap;
@@ -446,6 +414,47 @@ int isProductAvaible(Product* p, int quantity)
 
     return 1;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int rpcConnect(char* pszUserName, char* pszPass) {
+    User* user = userMap[pszUserName];
+    const char* pass = user->getPassword().c_str();
+    if (strcmp(pass, pszPass) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
+    KeyValue user, pass;
+    pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
+    pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
+
+    if (rpcConnect(userKeyValue.second, passKeyValue.second)) {
+        cout << userKeyValue.second << " is connected now...\n";
+        send(new_socket, "\nWelcome from server!", strlen("welcome from server!\n"), 0);
+        pthread_mutex_lock(&counter_mutex);
+        userCounter++;
+        printf("Number of active users : %d \n", userCounter);
+        pthread_mutex_unlock(&counter_mutex);
+
+    }
+    else {
+        cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
+        send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
+        return NULL;
+    }
+    return userKeyValue.second;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 int rpcAddItem(int new_socket, RawKeyValueString* pRawKey, string newUser) {
     KeyValue item;
     pair<char*, char*> itemKeyValue = extractKeyValue(pRawKey, item);
@@ -571,10 +580,12 @@ void* rpcThread(void* arg) {
                 pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
                 pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
 
-                if (hashMap.count(userKeyValue.second) > 0) {
+                if (userMap.count(userKeyValue.second) > 0) {
                     send(new_socket, "Sorry! User Already Exists!!", strlen("Sorry! User Already Exists!!"), 0);
                 } else {
-                    hashMap[userKeyValue.second] = passKeyValue.second;
+                    User* newSignUp;
+                    newSignUp = new User(1, userKeyValue.second, passKeyValue.second);
+                    userMap[userKeyValue.second] = newSignUp;
                     send(new_socket, "You successfully Signed up!", strlen("You successfully Signed up!"), 0);
                 }
             } else if (strcmp(rpc.second, "1") == 0) {
