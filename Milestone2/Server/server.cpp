@@ -415,10 +415,10 @@ public:
 		}
 
 		//check if the product is avaiable
-		cout << "int" << endl;
+
 		int quantity = atoi(itemKeyValue.second);
 		pthread_mutex_lock(&counter_mutex);
-		cout << "int2" << endl;
+
 		if (isProductAvaible(product, quantity) == 0)
 		{
 			send(new_socket, "Product quantity invalid!", strlen("Product quantity invalid!"), 0);
@@ -428,12 +428,12 @@ public:
 		}
 		//update quantity
 		cout << "int3" << endl;
-		cout << "adding item to user: " << newUser << "Job taking 5 second. Other user need to wait"<<endl;
+		cout << "adding item to user: " << newUser << ". Moving from  storage to user's cart taking 5 second. Other user need to wait"<<endl;
 		sleep(5);
-		cout << "sleep" << endl;
+
 		product->setQuantity(product->getQuantity() - quantity);
 		pthread_mutex_unlock(&counter_mutex);
-		cout << "int4" << endl;
+
 		int sucess = user->addItem(product->getName(), atoi(itemKeyValue.second));
 
 		send(new_socket, "Add item to cart!", strlen("Add item to cart!"), 0);
@@ -471,7 +471,7 @@ public:
 		}
 
 		//cout << product->getQuantity() << endl;
-		pthread_mutex_lock(&counter_mutex);
+	
 		if (user->deleteItem(product->getName(), quantity) == 0)
 		{
 			send(new_socket, "Can't find item in cart!", strlen("Can't find item in cart!"), 0);
@@ -479,7 +479,7 @@ public:
 		}
 
 		//give item back to the storage 
-
+		pthread_mutex_lock(&counter_mutex);
 		product->setQuantity(product->getQuantity() + quantity);
 		pthread_mutex_unlock(&counter_mutex);
 		send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
@@ -725,7 +725,7 @@ void* rpcThread(void* arg)
 				string str(newUser);
 				if (pServerContextData->rpcViewCart(new_socket, pRawKey, str))
 				{
-					cout << "Send cart item to user" << endl;
+					cout << "Send cart item to user " << str <<endl;
 				}
 			}
 
@@ -735,11 +735,11 @@ void* rpcThread(void* arg)
 
 				if (!pServerContextData->rpcAddItem(new_socket, pRawKey, str))
 				{
-					cout << "problem in additem" << endl;
+					cout << "problem adding item for user " <<str <<endl;
 				}
 				else
 				{
-					cout << "Done Add item for user " << str << endl;
+					cout << "Done Adding item for user " << str << endl;
 				}
 			}
 			else if (strcmp(rpc.second, "4") == 0)
@@ -747,11 +747,11 @@ void* rpcThread(void* arg)
 				string str(newUser);
 				if (!pServerContextData->rpcDeleteItem(new_socket, pRawKey, str))
 				{
-					cout << "problem in Deleteitem" << endl;
+					cout << "problem Deleting item for user " <<str <<endl;
 				}
 				else
 				{
-					cout << "delete item for user " << str << endl;
+					cout << "Done deleting item for user " << str << endl;
 				}
 			}
 
