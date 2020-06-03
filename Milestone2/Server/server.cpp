@@ -486,7 +486,7 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
         return 0;
     }
     
-    pthread_mutex_lock(&counter_mutex);
+    
     if (user->deleteItem(product->getName(), quantity) == 0)
     {
         send(new_socket, "Can't find item in cart!", strlen("Can't find item in cart!"), 0);
@@ -494,6 +494,7 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
     }
 
     //give item back to the storage 
+    pthread_mutex_lock(&counter_mutex);
     product->setQuantity(product->getQuantity() + quantity);
     pthread_mutex_unlock(&counter_mutex);
     send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
