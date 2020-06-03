@@ -486,15 +486,18 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
         return 0;
     }
     
-    //give item back to the storage 
     pthread_mutex_lock(&counter_mutex);
+    if (user->deleteItem(product->getName(), quantity) == 0)
+    {
+        send(new_socket, "Can't find item in cart!", strlen("Can't find item in cart!"), 0);
+        return 0;
+    }
+
+    //give item back to the storage 
     product->setQuantity(product->getQuantity() + quantity);
     pthread_mutex_unlock(&counter_mutex);
-
-    cout << product->getQuantity() << endl;
-    int sucess = user->deleteItem(product->getName(), quantity);
     send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
-    return sucess;
+    return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
