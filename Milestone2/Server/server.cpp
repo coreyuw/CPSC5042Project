@@ -472,10 +472,10 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
     //get cart 
     map<string, int> cart = user->getCart();
 
-    if (cart.count(itemKeyValue.first) == 0) {
-        send(new_socket, "Product not in cart, can't delete!", strlen("Product not in cart, can't delete!"), 0);
-        return 0;
-    }
+    //if (cart.count(itemKeyValue.first) == 0) {
+    //    send(new_socket, "Product not in cart, can't delete!", strlen("Product not in cart, can't delete!"), 0);
+    //    return 0;
+    //}
 
     //get product 
     Product* product = getProduct(atoi(itemKeyValue.first));
