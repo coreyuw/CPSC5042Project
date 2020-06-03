@@ -333,21 +333,6 @@ class Server {
         return new_socket;
     }
 
-    int chatter(int new_socket) {
-        int valread;
-        char buffer[1024] = {0};
-        const char* hello = "Hello from server";
-        valread = (int)read(new_socket, (void*)buffer, (size_t)1024);
-        printf("%s Bytes read = %d\n", buffer, valread);
-        // What RPC is it
-        // Parse out arguments
-        // Call the correct RPC Function
-
-        send(new_socket, hello, strlen(hello), 0);
-        printf("Hello message sent\n");
-        return 0;
-    }
-
     int closeServer() {
         return 0;
     }
@@ -681,7 +666,6 @@ int main(int argc, char const* argv[]) {
         }
         serverContextDataObj->setSocket(newSocket);
         pthread_create(&p1, NULL, rpcThread, (void*)serverContextDataObj);
-        //  printf("Server accepted one thread. On to another!\n");
 
     } while (status == 0);
     delete serverObj;
