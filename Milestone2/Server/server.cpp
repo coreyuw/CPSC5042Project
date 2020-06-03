@@ -379,6 +379,8 @@ int isProductAvaible(Product* p, int quantity)
 
     //update quantity
     pthread_mutex_lock(&counter_mutex);
+    cout << "wait 5 second to move item from storage to user cart" << endl;
+    sleep(5);
     p->setQuantity(p->getQuantity() - quantity);
     pthread_mutex_unlock(&counter_mutex);
 
@@ -588,7 +590,7 @@ void* rpcThread(void* arg) {
                 string str(newUser);
                 if (rpcViewCart(new_socket, pRawKey, str))
                 {
-                    cout << "Send cart item to user" << endl;
+                    cout << "Send cart item to user " << str<<endl;
                 }
             }
 
@@ -596,7 +598,7 @@ void* rpcThread(void* arg) {
                 string str(newUser);
                 
                 if (!rpcAddItem(new_socket, pRawKey, str)) {
-                    cout << "problem in additem" << endl;
+                    cout << "problem adding item" << str <<endl;
                 }
                 else
                 {
@@ -606,7 +608,7 @@ void* rpcThread(void* arg) {
                 string str(newUser);
                 if (!rpcDeleteItem(new_socket, pRawKey, str))
                 {
-                    cout << "problem in Deleteitem" << endl;
+                    cout << "problem Deleting item" << str<<endl;
                 }
                 else
                 {
