@@ -480,6 +480,8 @@ public:
 
 		//give item back to the storage 
 		pthread_mutex_lock(&counter_mutex);
+		cout << "take 5 second to get item back to storage" << endl;
+		sleep(5);
 		product->setQuantity(product->getQuantity() + quantity);
 		pthread_mutex_unlock(&counter_mutex);
 		send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
@@ -516,13 +518,14 @@ public:
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	const char* rpcListItem()
 	{
+		pthread_mutex_lock(&counter_mutex);
 		string message = "";
 		for (auto& i : storage)
 		{
 
 			message += "id = " + to_string(i->getID()) + "| name=" + i->getName() + "| Quantity=" + to_string(i->getQuantity()) + ".\n";
 		}
-
+		pthread_mutex_unlock(&counter_mutex);
 		return message.c_str();
 	}
 
