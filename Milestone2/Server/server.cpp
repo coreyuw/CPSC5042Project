@@ -1,7 +1,5 @@
 #include <cstdio>
 #include <cstdlib>
-
-// Server side C/C++ program to demonstrate Socket programming
 #include <assert.h>
 #include <bits/stdc++.h>
 #include <netinet/in.h>
@@ -10,13 +8,12 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
 #include <iostream>
 #include <map>
 #include <string>
-
 #include "assert.h"
 
+// Server side C/C++ program to demonstrate Socket programming
 
 using namespace std;
 int userCounter;
@@ -164,6 +161,7 @@ public:
     }
 
 };
+
 class User {
     // Data Members
    private:
@@ -223,20 +221,8 @@ class User {
         return cart;
     }
 
-    //char* insideCart() {
-      //  char* message;
-        //for (const auto& kv : cart) {
-          //  strcat(message, kv.first);
-            //strcat(message, "=");
-            //strcat(message, kv.second);
-            //strcat(message, ";");
-        //}
-    // return message;
-    //}
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 // This class will perform the various network Operations to set up the server
@@ -244,22 +230,19 @@ class User {
 class ServerContextData {
     // You will put in your own "Global Data" that you will share among all the various client connections you have. Change your "getters" to reflect that
     int connectionAmount;
-
     int nSocket;
     pthread_mutex_t lock;
     pthread_cond_t fill;
     int nMaxAmount;
    
-
    public:
+
     ServerContextData() {
         connectionAmount = 0;
-
         pthread_mutex_init(&lock, NULL);
         pthread_cond_init(&fill, NULL);
         nSocket = 0;
     }
-
 
     int getConnectionAmount() {
         int nConAmount;
@@ -285,13 +268,16 @@ class ServerContextData {
 };
 
 class Server {
+
    private:
+
     int m_server_fd;
     struct sockaddr_in m_address;
     int m_addrlen = sizeof(m_address);
     int m_port;
 
    public:
+
     Server(int nPort) {
         m_port = nPort;
     }
@@ -314,9 +300,9 @@ class Server {
             perror("setsockopt");
             exit(EXIT_FAILURE);
         }
+
         m_address.sin_family = AF_INET;
         m_address.sin_addr.s_addr = INADDR_ANY;
-
         m_address.sin_port = (uint16_t)htons((uint16_t)m_port);
 
         // Forcefully attaching socket to the port 8080
@@ -325,6 +311,7 @@ class Server {
             perror("bind failed");
             exit(EXIT_FAILURE);
         }
+
         if (listen(m_server_fd, 3) < 0) {
             perror("listen");
             exit(EXIT_FAILURE);
@@ -366,8 +353,6 @@ class Server {
     }
 };
 
-
-
 vector<Product*> storage;
 map<string, User*> userMap;
 
@@ -387,6 +372,7 @@ Product* getProduct(int id)
 int getProductIDFromName(string name)
 {
     int id = 0;
+
     for (auto& elem : storage)
     {
         if (name.compare(elem->getName())==0 )
@@ -400,7 +386,6 @@ int getProductIDFromName(string name)
 //need to check if product is avaiable 
 int isProductAvaible(Product* p, int quantity)
 {
- 
     if (p->getQuantity() == 0 || p->getQuantity() - quantity < 0)
     {
         cout << "return 0" << endl;
@@ -422,8 +407,10 @@ int rpcConnect(char* pszUserName, char* pszPass) {
           
         return 0;
     }
+
     User* user = userMap[pszUserName];
     const char* pass = user->getPassword().c_str();
+
     if (strcmp(pass, pszPass) == 0) {
         return 1;
     }
@@ -455,11 +442,6 @@ char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
-
 int rpcAddItem(int new_socket, RawKeyValueString* pRawKey, string newUser) {
     KeyValue item;
     pair<char*, char*> itemKeyValue = extractKeyValue(pRawKey, item);
@@ -469,6 +451,7 @@ int rpcAddItem(int new_socket, RawKeyValueString* pRawKey, string newUser) {
 
     //get product 
     Product* product = getProduct(atoi(itemKeyValue.first));
+
     if (product == NULL)
     {
         send(new_socket, "Product ID not exist!", strlen("Product ID not exist!"), 0);
@@ -497,11 +480,13 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
     pair<char*, char*> itemKeyValue = extractKeyValue(pRawKey, item);
 
     int quantity = atoi(itemKeyValue.second);
+
     //get user
     User* user = userMap[newUser];
 
     //get product 
     Product* product = getProduct(atoi(itemKeyValue.first));
+
     if (product == NULL)
     {
         send(new_socket, "Product ID not exist!", strlen("Product ID not exist!"), 0);
@@ -649,7 +634,6 @@ void* rpcThread(void* arg) {
     return NULL;
 }
 
-
 //Populate product 
 void populateProduct()
 {
@@ -695,7 +679,6 @@ int main(int argc, char const* argv[]) {
             printf("Problems\n");
             status = -1;
         }
-        //	serverObj->chatter(newSocket);
         serverContextDataObj->setSocket(newSocket);
         pthread_create(&p1, NULL, rpcThread, (void*)serverContextDataObj);
         //  printf("Server accepted one thread. On to another!\n");
