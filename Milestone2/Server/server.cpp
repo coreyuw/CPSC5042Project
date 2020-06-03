@@ -566,9 +566,11 @@ void* rpcThread(void* arg) {
                 if (userMap.count(userKeyValue.second) > 0) {
                     send(new_socket, "Sorry! User Already Exists!!", strlen("Sorry! User Already Exists!!"), 0);
                 } else {
-                    User* newSignUp;
-                    newSignUp = new User(1, userKeyValue.second, passKeyValue.second);
+                    
+                    pthread_mutex_lock(&counter_mutex);
+                    User* newSignUp = new User(1, userKeyValue.second, passKeyValue.second);
                     userMap[userKeyValue.second] = newSignUp;
+                    pthread_mutex_unlock(&counter_mutex);
                     send(new_socket, "You successfully Signed up!", strlen("You successfully Signed up!"), 0);
                 }
             } else if (strcmp(rpc.second, "1") == 0) {
