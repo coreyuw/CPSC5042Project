@@ -331,12 +331,8 @@ public:
 	{
 		if (p->getQuantity() == 0 || p->getQuantity() - quantity < 0)
 		{
-			cout << "return 0" << endl;
 			return 0;
 		}
-
-
-
 		return 1;
 	}
 
@@ -427,7 +423,6 @@ public:
 
 		}
 		//update quantity
-		cout << "int3" << endl;
 		cout << "adding item to user: " << newUser << ". Moving from  storage to user's cart taking 5 second. Other user need to wait"<<endl;
 		sleep(5);
 
@@ -455,12 +450,6 @@ public:
 		//get cart 
 		map<string, int> cart = user->getCart();
 
-		//if (cart.count(itemKeyValue.first) == 0)
-		//{
-		//	send(new_socket, "Product not in cart, can't delete!", strlen("Product not in cart, can't delete!"), 0);
-		//	return 0;
-		//}
-
 		//get product 
 		Product* product = getProduct(atoi(itemKeyValue.first));
 
@@ -469,8 +458,6 @@ public:
 			send(new_socket, "Product ID not exist!", strlen("Product ID not exist!"), 0);
 			return 0;
 		}
-
-		//cout << product->getQuantity() << endl;
 	
 		if (user->deleteItem(product->getName(), quantity) == 0)
 		{
@@ -480,7 +467,7 @@ public:
 
 		//give item back to the storage 
 		pthread_mutex_lock(&counter_mutex);
-		cout << "take 5 second to get item back to storage" << endl;
+		cout << "Take 5 second to get item back to storage" << endl;
 		sleep(5);
 		product->setQuantity(product->getQuantity() + quantity);
 		pthread_mutex_unlock(&counter_mutex);
@@ -683,7 +670,6 @@ void* rpcThread(void* arg)
 		if (valread != 0)
 		{
 			RawKeyValueString* pRawKey = new RawKeyValueString((char*)buffer);
-			cout << (char*)buffer << endl;
 			KeyValue rpcKeyValue;
 			pair<char*, char*> rpc = extractKeyValue(pRawKey, rpcKeyValue);
 
