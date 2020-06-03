@@ -415,21 +415,25 @@ public:
 		}
 
 		//check if the product is avaiable
+		cout << "int" << endl;
 		int quantity = atoi(itemKeyValue.second);
 		pthread_mutex_lock(&counter_mutex);
+		cout << "int2" << endl;
 		if (isProductAvaible(product, quantity) == 0)
 		{
 			send(new_socket, "Product quantity invalid!", strlen("Product quantity invalid!"), 0);
+			pthread_mutex_unlock(&counter_mutex);
 			return 0;
 
 		}
 		//update quantity
-
+		cout << "int3" << endl;
 		cout << "adding item to user: " << newUser << "Job taking 5 second. Other user need to wait"<<endl;
 		sleep(5);
+		cout << "sleep" << endl;
 		product->setQuantity(product->getQuantity() - quantity);
 		pthread_mutex_unlock(&counter_mutex);
-
+		cout << "int4" << endl;
 		int sucess = user->addItem(product->getName(), atoi(itemKeyValue.second));
 
 		send(new_socket, "Add item to cart!", strlen("Add item to cart!"), 0);
