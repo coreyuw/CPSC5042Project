@@ -335,10 +335,7 @@ public:
 			return 0;
 		}
 
-		//update quantity
-		pthread_mutex_lock(&counter_mutex);
-		p->setQuantity(p->getQuantity() - quantity);
-		pthread_mutex_unlock(&counter_mutex);
+
 
 		return 1;
 	}
@@ -418,12 +415,20 @@ public:
 		}
 
 		//check if the product is avaiable
-		if (isProductAvaible(product, atoi(itemKeyValue.second)) == 0)
+		int quantity = atoi(itemKeyValue.second);
+		pthread_mutex_lock(&counter_mutex);
+		if (isProductAvaible(product, quantity) == 0)
 		{
 			send(new_socket, "Product quantity invalid!", strlen("Product quantity invalid!"), 0);
 			return 0;
 
 		}
+		//update quantity
+
+		cout << "adding item to user: " << newUser << "Job taking 5 second. Other user need to wait"<<endl;
+		sleep(5);
+		product->setQuantity(product->getQuantity() - quantity);
+		pthread_mutex_unlock(&counter_mutex);
 
 		int sucess = user->addItem(product->getName(), atoi(itemKeyValue.second));
 
@@ -461,15 +466,20 @@ public:
 			return 0;
 		}
 
-		//give item back to the storage 
+		//cout << product->getQuantity() << endl;
 		pthread_mutex_lock(&counter_mutex);
+		if (user->deleteItem(product->getName(), quantity) == 0)
+		{
+			send(new_socket, "Can't find item in cart!", strlen("Can't find item in cart!"), 0);
+			return 0;
+		}
+
+		//give item back to the storage 
+
 		product->setQuantity(product->getQuantity() + quantity);
 		pthread_mutex_unlock(&counter_mutex);
-
-		cout << product->getQuantity() << endl;
-		int sucess = user->deleteItem(product->getName(), quantity);
 		send(new_socket, "Delete item from cart!", strlen("Delete item from cart!"), 0);
-		return sucess;
+		return 1;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -725,7 +735,7 @@ void* rpcThread(void* arg)
 				}
 				else
 				{
-					cout << "Add item fore user " << str << endl;
+					cout << "Done Add item for user " << str << endl;
 				}
 			}
 			else if (strcmp(rpc.second, "4") == 0)
