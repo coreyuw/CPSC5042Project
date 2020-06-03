@@ -469,6 +469,14 @@ int rpcDeleteItem(int new_socket, RawKeyValueString* pRawKey, string newUser)
     //get user
     User* user = userMap[newUser];
 
+    //get cart 
+    map<string, int> cart = user->getCart();
+
+    if (cart.count(itemKeyValue.first) == 0) {
+        send(new_socket, "Product not in cart, can't delete!", strlen("Product not in cart, can't delete!"), 0);
+        return 0;
+    }
+
     //get product 
     Product* product = getProduct(atoi(itemKeyValue.first));
 
@@ -567,7 +575,7 @@ void* rpcThread(void* arg) {
                 const char* message = rpcListItem();
     
                 send(new_socket, message, strlen(message), 0);
-                cout << newUser << " request liost Item" << endl;
+                cout << newUser << " requested list Item" << endl;
             }
 
             else if (strcmp(rpc.second, "2") == 0) {
