@@ -417,6 +417,11 @@ int isProductAvaible(Product* p, int quantity)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int rpcConnect(char* pszUserName, char* pszPass) {
+    //Check if username or password is wrong while Sign-in
+    if (!userMap.count(pszUserName)) {
+          
+        return 0;
+    }
     User* user = userMap[pszUserName];
     const char* pass = user->getPassword().c_str();
     if (strcmp(pass, pszPass) == 0) {
