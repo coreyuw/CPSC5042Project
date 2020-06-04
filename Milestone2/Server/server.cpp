@@ -632,6 +632,8 @@ void* rpcThread(void* arg) {
                 string str(newUser);
                 if (pServerContextData->rpcViewCart(new_socket, pRawKey, str)) {
                     cout << "Send cart item to user " << str << endl;
+                } else {
+                    cout << "Send cart item to user " << str << endl;
                 }
             }
 
