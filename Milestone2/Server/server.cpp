@@ -311,7 +311,7 @@ class ServerContextData {
     }
 
     //check authorizedUser
-    char* authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
+    string authorizedUser(int new_socket, pair<char*, char*> rpc, RawKeyValueString* pRawKey) {
         KeyValue user, pass;
         pair<char*, char*> userKeyValue = extractKeyValue(pRawKey, user);
         pair<char*, char*> passKeyValue = extractKeyValue(pRawKey, pass);
@@ -329,7 +329,8 @@ class ServerContextData {
             send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
             return NULL;
         }
-        return userKeyValue.second;
+        string s(userKeyValue.second);
+        return s;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -578,7 +579,7 @@ void* rpcThread(void* arg) {
     int valread;
     char buffer[1024] = {0};
     void* status = NULL;
-    char* newUser;
+    string newUser;
 
     // We will  block when there are too many connections. Lets say 100
     ServerContextData* pServerContextData = (ServerContextData*)arg;
@@ -629,33 +630,33 @@ void* rpcThread(void* arg) {
 
             //View cart
             else if (strcmp(rpc.second, "2") == 0) {
-                string str(newUser);
-                if (pServerContextData->rpcViewCart(new_socket, pRawKey, str)) {
-                    cout << "Send cart item to user " << str << endl;
+                //string str(newUser);
+                if (pServerContextData->rpcViewCart(new_socket, pRawKey, newUser)) {
+                    cout << "Send cart item to user " << newUser << endl;
                 } else {
-                    cout << "Send cart item to user " << str << endl;
+                    cout << "Send cart item to user " << newUser << endl;
                 }
             }
 
             //Add rpc
             else if (strcmp(rpc.second, "3") == 0) {
-                string str(newUser);
+                //string str(newUser);
 
-                if (!pServerContextData->rpcAddItem(new_socket, pRawKey, str)) {
-                    cout << "problem adding item for user " << str << endl;
+                if (!pServerContextData->rpcAddItem(new_socket, pRawKey, newUser)) {
+                    cout << "problem adding item for user " << newUser << endl;
                 } else {
-                    cout << "Done Adding item for user " << str << endl;
+                    cout << "Done Adding item for user " << newUser << endl;
                 }
 
             }
 
             //Delete Rpc
             else if (strcmp(rpc.second, "4") == 0) {
-                string str(newUser);
-                if (!pServerContextData->rpcDeleteItem(new_socket, pRawKey, str)) {
-                    cout << "problem Deleting item for user " << str << endl;
+                //string str(newUser);
+                if (!pServerContextData->rpcDeleteItem(new_socket, pRawKey, newUser)) {
+                    cout << "problem Deleting item for user " << newUser << endl;
                 } else {
-                    cout << "Done deleting item for user " << str << endl;
+                    cout << "Done deleting item for user " << newUser << endl;
                 }
             }
 

@@ -233,10 +233,13 @@ int main(int argc, char const* argv[]) {
     int status = 0;
 
     status = connectToServer((char*)argv[1], (char*)argv[2], sock);
-    int temp = connectRPC(sock);
-    while (status && temp) {
-        status = menu(sock);
+    if (status) {
+        int temp = connectRPC(sock);
+        while (status && temp) {
+            status = menu(sock);
+        }
     }
+
     close(sock);
     return 0;
 }
