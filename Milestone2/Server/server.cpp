@@ -480,28 +480,20 @@ class ServerContextData {
 
     //Populate product in the fist run
     void populateProduct() {
-        Product* one = new Product(1, "toilet paper", 5);
-        Product* two = new Product(2, "table", 5);
-        Product* three = new Product(3, "mask", 5);
-        Product* four = new Product(4, "Apple", 10);
-        Product* five = new Product(5, "Banana", 10);
-        storage.push_back(one);
-        storage.push_back(two);
-        storage.push_back(three);
-        storage.push_back(four);
-        storage.push_back(five);
+        storage.push_back(new Product(1, "toilet paper", 5));
+        storage.push_back(new Product(2, "table", 5));
+        storage.push_back(new Product(3, "mask", 5));
+        storage.push_back(new Product(4, "Apple", 10));
+        storage.push_back(new Product(5, "Banana", 10));
     }
 
     //Populate member
     void populateUser() {
-        User* Hung = new User(1, "hung", "123");
-        userMap["hung"] = Hung;
+        userMap["hung"] = new User(1, "hung", "123");
 
-        User* sam = new User(1, "sam", "123");
-        userMap["sam"] = sam;
+        userMap["sam"] = new User(1, "sam", "123");
 
-        User* corey = new User(1, "corey", "123");
-        userMap["corey"] = corey;
+        userMap["corey"] = new User(1, "corey", "123");
     }
 };
 
