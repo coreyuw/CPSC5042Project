@@ -23,6 +23,7 @@ char buffer[1024] = {0};
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+//Get Message for server
 string getMessage() {
     string username;
     string password;
@@ -37,6 +38,7 @@ string getMessage() {
     return messageTOserver;
 }
 
+//Sign up user
 string signUpUser() {
     string username;
     string password;
@@ -87,6 +89,7 @@ int connectRPC(int& sock) {
     return 0;
 }
 
+//Connect to server
 int connectToServer(char* szHostName, char* szPort, int& sock) {
     struct sockaddr_in serv_addr;
 
@@ -128,6 +131,7 @@ int disconnectServer(int& sock) {
     return 0;
 }
 
+//Add item Rpc
 string rpcAddItem() {
     string input;
     string sendMess = "rpc=3;";
@@ -147,6 +151,8 @@ string rpcAddItem() {
     sendMess += input + ";";
     return sendMess;
 }
+
+//Delete item Rpc
 string rpcDeleteItem() {
     string input;
     string sendMess = "rpc=4;";
@@ -166,6 +172,7 @@ string rpcDeleteItem() {
     sendMess += input + ";";
     return sendMess;
 }
+
 //Menu item for user
 int menu(int& sock) {
     memset(buffer, 0, sizeof(buffer));
@@ -175,16 +182,23 @@ int menu(int& sock) {
     cout << "Enter your option: ";
     getline(cin, option);
 
+    //View storage
     if (option == "1") {
         send(sock, "rpc=1;", strlen("rpc=1;"), 0);
         valread = (int)read(sock, buffer, 1024);
         cout << buffer << endl;
 
-    } else if (option == "2") {
+    }
+
+    //View cart
+    else if (option == "2") {
         send(sock, "rpc=2;", strlen("rpc=2;"), 0);
         valread = (int)read(sock, buffer, 1024);
         cout << buffer << endl;
-    } else if (option == "3") {
+    }
+
+    //Add item to cart
+    else if (option == "3") {
         string message = rpcAddItem();
         if (!message.empty()) {
             send(sock, message.c_str(), strlen(message.c_str()), 0);
@@ -192,14 +206,20 @@ int menu(int& sock) {
             cout << buffer << endl;
         }
 
-    } else if (option == "4") {
+    }
+
+    //Delete item in cart
+    else if (option == "4") {
         string message = rpcDeleteItem();
         if (!message.empty()) {
             send(sock, message.c_str(), strlen(message.c_str()), 0);
             valread = (int)read(sock, buffer, 1024);
             cout << buffer << endl;
         }
-    } else if (option == "5") {
+    }
+
+    //Disconnect from server
+    else if (option == "5") {
         return disconnectServer(sock);
 
     } else
