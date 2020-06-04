@@ -483,7 +483,7 @@ class ServerContextData {
         Product* two = new Product(2, "table", 5);
         Product* three = new Product(3, "mask", 5);
         Product* four = new Product(4, "Apple", 10);
-        product* five = new Product(5, "Banana", 10);
+        Product* five = new Product(5, "Banana", 10);
         storage.push_back(one);
         storage.push_back(two);
         storage.push_back(three);
