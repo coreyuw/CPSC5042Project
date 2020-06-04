@@ -372,7 +372,7 @@ class ServerContextData {
             return 0;
         }
         //update quantity
-        cout << "adding item to user: " << newUser << ". Moving from  storage to user's cart taking 5 second. Other user need to wait" << endl;
+        cout << "adding item to user: " << newUser << ". Moving from storage to user's cart taking 5 second. Other user need to wait" << endl;
         sleep(5);
 
         product->setQuantity(product->getQuantity() - quantity);
