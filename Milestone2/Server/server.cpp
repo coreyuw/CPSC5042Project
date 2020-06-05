@@ -327,7 +327,7 @@ class ServerContextData {
         } else {
             cout << "New User Connection Faild! Incorrect Username or Password! " << endl;
             send(new_socket, "Not Authorized", strlen("Not Authorized"), 0);
-            return NULL;
+            return "";
         }
         string s(userKeyValue.second);
         return s;
